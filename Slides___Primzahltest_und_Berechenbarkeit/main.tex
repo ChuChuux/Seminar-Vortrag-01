@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{url}
+\usepackage{xcolor} %vonmir
 
 \usepackage{algorithm} %vonmir
 \usepackage[noend]{algpseudocode} %vonmir; noend hilft das kein endif endfor am Ende dasteht
@@ -15,6 +16,7 @@
 \newcommand{\R}{\mathbb{R}}% reele Zahlen
 \newcommand{\C}{\mathbb{C}}% komplexe Zahlen
 \newcommand{\Q}{\mathbb{Q}}% rationale Zahlen
+\newcommand{\beweis}[1]{\textbf{\structure{Beweis~#1.}}}
 
 
 \newtheorem{thm}{Satz}
@@ -125,7 +127,7 @@ Eine \textbf{Sprache} über dem Alphabet A ist eine Teilmenge von $A^\ast$.
    \begin{definition}
        Eine natürliche Zahl $n$ heißt prim, wenn \(
        n \geq 2
-       \) ist und es keine natürliche Zahl $a$ und $b$ gibt mit \( a \geq 1, b \geq 1\) und $n= a \cdot b$
+       \) ist und es keine natürliche Zahl $a$ und $b$ gibt mit \( a > 1, b > 1\) und $n= a \cdot b$
    \end{definition}
 
   
@@ -166,12 +168,34 @@ b | a \iff a \bmod b = 0.
 \end{frame}
 
 \begin{frame}{4 Primzahltest - Algorithmus}
-   [Hier ist der erste Algorithmus]
+   
+   Nun erfolgt der Algorithmus, ob eine natürliche Zahl prim ist oder nicht in Pseudocode
+   
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Require $n \in \mathbb{N}$
+\Ensure Antwort auf die Frage, ob $n$ prim ist
+\If{$n = 1$}
+    \State $\text{antwort} \gets \text{``nein''}$
+\Else
+    \State $\text{antwort} \gets \text{``ja''}$
+    \For{$i \gets 2$ \textbf{to} $\lfloor \sqrt{n} \rfloor$}
+        \If{$i \mid n$}
+            \State $\text{antwort} \gets \text{``nein''}$
+        \EndIf
+    \EndFor
+\EndIf
+\State \Return $\text{antwort}$
+\end{algorithmic}
+\end{algorithm}
+
 \end{frame}
 
+
+\section{Eratosthenes}
 \begin{frame}{5 Sieb des Eratosthenes – Überblick}
 \begin{itemize}
-    \item Algorithmus
+   \item Algorithmus
     \item Beweis
 \end{itemize}
 \end{frame}
@@ -181,7 +205,26 @@ b | a \iff a \bmod b = 0.
 
 Nach Eingabe einer natürlichen Zahl n besteht die Aufgabe darin, alle Primzahlen p mit p $\le$ n zu berechnen. Der Algorithmus lautet wie folgt:
 
-[Algorithmus 2]
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Require $n \in \mathbb{N}$
+\Ensure alle Primzahlen $\leq n$
+
+\For{$i \gets 2$ \textbf{to} $n$}
+    \State $p[i] \gets \text{``ja''}$
+\EndFor
+
+\For{$i \gets 2$ \textbf{to} $n$}
+    \If{$p[i] = \text{``ja''}$}
+        \For{$j \gets i$ \textbf{to} $\lfloor \frac{n}{i} \rfloor$}
+            \State $p[i \cdot j] \gets \text{``nein''}$
+        \EndFor
+    \EndIf
+\EndFor
+
+\State \Return alle $i$ mit $p[i] = \text{``ja''}$
+\end{algorithmic}
+\end{algorithm}
     
 \end{frame}
 
@@ -208,7 +251,9 @@ Dies beweisen wir indem wir folgende 2 Aussagen beweisen
 \subsection{Beweis}
 \begin{frame}{5 Sieb des Eratosthenes}
 
-\textbf{(1) Ist \(k\) prim, so wird \(k\) ausgegeben.}
+\textcolor{structure}{\textbf{Beweis 1.}}
+
+    \textbf{(1) Ist \(k\) prim, so wird \(k\) ausgegeben.}
 
 Sei \(k \in \{2, \dots, n\}\) eine Primzahl. Im Algorithmus wird eine Zahl \(k\) genau dann nicht ausgegeben, wenn irgendwann 
 \(p[k] \leftarrow \text{``nein''}\) gesetzt wird. Wir zeigen, dass dies für Primzahlen nicht passiert.
@@ -272,6 +317,7 @@ Damit ist die Korrektheit des Algorithmus gezeigt.
 
 \end{frame}
 
+\section{Halteproblem}
 \begin{frame}{6 Halteproblem – Überblick}
 \begin{itemize}
     \item Kodierung von Wörtern (Lemma)
@@ -299,8 +345,9 @@ Damit ist die Korrektheit des Algorithmus gezeigt.
 \end{frame}
 
 \begin{frame}{6  Halteproblem}
-\begin{block}{Beweis X}
-    
+
+%\begin{block}{Beweis X}
+\beweis{2}
 
     \textbf{1. Wohldefiniertheit:}
 
@@ -318,6 +365,11 @@ Durch Aufsummieren erhalten wir
 \le \sum_{i=1}^l (k-1)k^{l-i}.
 \]
 Die rechte Summe ist eine geometrische Reihe:
+
+\end{frame}
+
+\begin{frame}{6 Halteproblem}
+Wir formen die rechte Summe um:
 \[
 \sum_{i=1}^l (k-1)k^{l-i}
 = (k-1)\sum_{i=1}^l{k^{l-i}}
@@ -327,10 +379,6 @@ Die rechte Summe ist eine geometrische Reihe:
 = (k-1)\cdot \frac{k^l - 1}{k-1}
 = k^l - 1.
 \]
-\end{block}
-\end{frame}
-
-\begin{frame}{6 Halteproblem}
     Also gilt insgesamt
 \[
 0 \le f_l(a_1,\dots,a_l) \le k^l - 1,
@@ -417,8 +465,7 @@ Die Mengen haben dieselbe Mächtigkeit:
 \]
 
 Die linke Menge besteht aus allen Tupeln der Länge l. Für jede Position gibt es k verschiedene Möglichkeiten. Die Anzahl ergibt sich also als Produkt $k\cdot k\cdot k \dots k = k^l$. Die rechte Menge besteht einfach aus allen Zahlen von 0 bis $k^l-1$, weist also auch die Anzahl $k^l$ auf (am Ende zieht man zwar 1 ab, fängt aber mit 0 an).
-\hfill$\square$
-    
+
 \end{frame}
 
 \begin{frame}{6 Halteproblem}
@@ -427,7 +474,8 @@ Da $f^l$ eine injektive Abbildung zwischen zwei endlichen Mengen gleicher Größ
 
 \vspace{0.5em}
 
-$f^l$ ist somit bijektiv. $\qed$
+$f^l$ ist somit bijektiv. %$\qed$
+\hfill$\square$
     
 \end{frame}
 
@@ -445,7 +493,7 @@ Der Beweis wird in Folge nur skizziert:
 
     
 
-\begin{proof}[Beweisskizze]
+\beweis{3}
 Die Idee des Beweises besteht darin, die Wörter aus $A^*$ systematisch zu nummerieren.
 
 Zunächst werden alle Wörter nach ihrer Länge geordnet. Für jedes $l \in \N$ gibt es genau $|A|^l$ Wörter der Länge $l$. Da $A$ endlich ist, ist somit auch jede Menge $A^l$ endlich.
@@ -455,7 +503,7 @@ Anschließend werden die Wörter fester Länge $l$ eindeutig als Zahlen im $|A|$
 Durch diese Kodierung erhält man eine injektive Abbildung von $A^*$ nach $\N$, da Wörter unterschiedlicher Länge in verschiedene Bereiche fallen und die Darstellung innerhalb fester Länge eindeutig ist.
 
 Damit ist $A^*$ abzählbar.
-\end{proof}
+\hfill$\square$
 \end{frame}
 
 \begin{frame}{6 Halteproblem}
@@ -465,9 +513,9 @@ Damit ist $A^*$ abzählbar.
     Die Menge aller C++-Programme ist abzählbar.
 \end{cor}
 
-\begin{proof}
-    C++-Programme sind Wörter über einem endlichen Alphabet. Die zu zeigende Aussage folgt also aus Satz \ref{abzählbar}.
-\end{proof}    
+\beweis{4}
+    C++-Programme sind Wörter über einem endlichen Alphabet. Die zu zeigende Aussage folgt also aus Satz \ref{abzählbar}.  
+    \hfill$\square$
 \end{frame}
 
 \begin{frame}{6 Halteproblem}
@@ -476,7 +524,7 @@ Damit ist $A^*$ abzählbar.
 
 \end{thm}
 
-\begin{block}{Beweis X}
+\beweis{5}
     Sei $\mathcal{P}$ die nach Korrolar \ref{abzählbar} abzählbare Menge der C++-Programme, die eine Funktion \(f: \N\to \{0,1\} \) berechnen.
 
     Sei \(g: \mathcal{P}\to \{0,1\} \) eine injektive Funktion. 
@@ -490,8 +538,7 @@ Damit ist $A^*$ abzählbar.
     \(
     P \in \mathcal{P}
     \), und somit wird f von keinem C++ Programm berechnet.
-
-    \end{block}
+    \hfill$\square$
 \end{frame}
 
 \subsection{Halteproblem}
@@ -531,7 +578,7 @@ Diese Funktion heißt \textbf{Haltefunktion} und ihr zugehöriges Entscheidungsp
     Die Haltefunktion wird von keinem C++ Programm berechnet. Das heißt es existiert kein Programm das $h$ berechnet.
 \end{thm}
 
-\begin{block}[Beweis X]
+\beweis{6}
     Die Beweisidee ist ein Widerspruchsbeweis.
     
     Angenommen, es existiert ein Programm $P$, das $h(x,y)$ korrekt berechnet. Wir konstruieren ein neues Programm $Q$, das wie folgt funktioniert:
@@ -547,7 +594,7 @@ Diese Funktion heißt \textbf{Haltefunktion} und ihr zugehöriges Entscheidungsp
     \begin{block}{Schlüsselidee}
 Es passiert genau das \alert{Gegenteil} von dem, was \( h \) vorhersagt.
 \end{block}
-    \end{block}
+
 \end{frame}
 
 \begin{frame}{6 Halteproblem}
