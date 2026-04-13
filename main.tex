@@ -1,7 +1,4 @@
-%\usepackage{graphicx} % Required for inserting images
-%\date{April 2026}
-
-\documentclass{article}
+\documentclass{beamer}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{german}
 \usepackage{amsmath}
@@ -10,224 +7,222 @@
 \usepackage{url}
 
 \usepackage{algorithm} %vonmir
-\usepackage{algpseudocode} %vonmir
+\usepackage[noend]{algpseudocode} %vonmir; noend hilft das kein endif endfor am Ende dasteht
 
+
+\newcommand{\Z}{\mathbb{Z}}% ganze Zahlen, fehlte in Vorlage
+\newcommand{\N}{\mathbb{N}}% natürliche Zahlen, fehlte in Vorlage
 \newcommand{\R}{\mathbb{R}}% reele Zahlen
 \newcommand{\C}{\mathbb{C}}% komplexe Zahlen
 \newcommand{\Q}{\mathbb{Q}}% rationale Zahlen
-\newcommand{\N}{\mathbb{N}}% natürliche Zahlen % von mir
 
 
 \newtheorem{thm}{Satz}
 \newtheorem{cor}[thm]{Korollar}
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
-\newtheorem{definition}[thm]{Definition} % von mir
-%\newtheorem{beweis}[thm]{Beweis}
 
-\begin{document} %war vorher nach author, aber overleaf beschwerte sich
 
-\title{Primzahltest und Berechenbarkeit}
+\setbeamertemplate{theorems}[numbered] %von mir zum Nummerieren
+%\setbeamertemplate{theorems}[normal font]
+
+\AtBeginSection[]{
+\begin{frame}{Überblick}
+\tableofcontents[currentsection]
+\end{frame}
+}
+
+\AtBeginSubsection[]{
+\begin{frame}{Überblick}
+\tableofcontents[currentsection, currentsubsection]
+\end{frame}
+} %von mir
+
+\title{Proseminar: Primzahltest und Berechenbarkeit}
+\author{Jana Chung}
 \date{\today}
-\author{Jana Chung\\ \url{jana.chung@uni-bielefeld.de}}
 
+\begin{document}
 
-\maketitle
+% Title Slide
+\begin{frame}
+    \titlepage
+\end{frame}
 
-\begin{center}
-      Die vorliegende Ausarbeitung orientiert sich in Aufbau und Inhalt 
-maßgeblich an dem Lehrbuch \cite{HougardyVygen2018}. 
-\end{center}
-  
+% First Content Slide
+\begin{frame}{Inhaltsverzeichnis}
+    \begin{enumerate}
+        \item Was ist ein Algorithmus
+        \item Berechnungsproblem
+        \item Pseudocode
+        \item Primzahltest
+       \item Sieb des Eratosthenes
+        \item Halteproblem
+        
+    \end{enumerate}
+\end{frame}
 
+\begin{frame}{1 Was ist ein Algorithmus}
+    Ein Algorithmus ist eine endliche, wohldefinierte Folge von Anweisungen, die für
+jede zulässige Eingabe nach endlich vielen Schritten terminiert und eine Ausgabe
+liefert 
+    \begin{itemize}
+        \item  Welche Eingaben akzeptiert er?
+        \item  Welche Rechenschritte werden in welcher Reihenfolge durchgeführt?
+        \item  Wann stoppt der Algorithmus? Was wird dann ausgegeben?
+    \end{itemize}
 
-\newpage
-\section{Was ist ein Algorithmus}
+\end{frame}
 
-Ein Algorithmus ist eine endliche, wohldefinierte Folge von Anweisungen, die für jede zulässige Eingabe nach endlich vielen Schritten terminiert und eine Ausgabe liefert. 
-Relevant sind folgende Aspekte:
-\begin{itemize}
-    \item Welche Eingaben akzeptiert er?
-    \item Welche Rechenschritte werden in welcher Reihenfolge durchgeführt?
-    \item Wann stoppt der Algorithmus? Was wird dann ausgegeben?
-\end{itemize}
+\begin{frame}{2 Berechnungsprobleme}
+    Durch eine Funktion $f\colon A \to B$ können wir ausdrücken dass ein Computerprogramm bei Eingabe eines Inputs \(a \in A\) das Ergebnis \(f(a) \in B\) ausgibt.
 
-Algorithmen können von Menschen ausgeführt werden (z.B. Gauß-Elimination), in Hardwares implementiert werden oder in Software (d.h. als Computerprogramm in der Programmiersprache) geschrieben werden.
-
-
-\section{Berechnungsprobleme}
-
-Durch eine Funktion $f\colon A \to B$  können wir ausdrücken, dass ein Computerprogramm bei Eingabe \(a \in A\) das Ergebnis \(f(a) \in B\) ausgibt. Da Computer meist intern nur mit Nullen und Einsen rechnen, erlauben wir als Ein- und Ausgabe andere Zeichenketten.
-
-\begin{definition}
-    
-Sei A eine nichtleere endliche Menge. Für $k \in \N \cup \{0\}$ bezeichnen wir mit $A^k$ die Menge der Funktionen $f: {1,\dots,k}] \rightarrow A$.
+\begin{definition}   
+Sei A eine nichtleere endliche Menge. Für $k \in \N \cup \{0\}$ bezeichnen wir mit $A^k$ die Menge der Funktionen $f: \{1,\dots,k\} \rightarrow A$.
 Ein Element f $\in A^k$ heißt \textbf{Wort / Zeichenkette} der \textbf{Länge} k über dem \textbf{Alphabet} A. Wir schreiben es als Folge $f(1)... f(k)$.  
 Das einzige Element $\emptyset$ von $A^0$ nennen wir das \textbf{leere Wort} (mit Länge 0). Wir setzen $A^\ast:= \bigcup_{k\in \N \cup \{0\}}^{} A^k$.
 Eine \textbf{Sprache} über dem Alphabet A ist eine Teilmenge von $A^\ast$.
 %Buch Def. 1.5.
 \end{definition}
 
-Auf dieser Definition baut die folgende auf: 
+\end{frame}
+
+
+\begin{frame}{2 Berechnungsprobleme}
 
 \begin{definition}
-     Ein \textbf{Berechnungsproblem} ist eine Relation $P \subseteq D \times$ E, wobei es zu jedem d $\in$ D mindestens ein e $\in$ E gibt mit $(d,e) \in $ P. Wenn $(d,e) \in$ P, dann ist e eine \textbf{korrekte Ausgabe} für das Problem P mit Eingabe d. Die Elemente von D heißen \textbf{Instanzen} des Problems. P heißt \textbf{eindeutig}, wenn P eine Funktion ist. Sind D, E Sprachen über einem endlichen Alphabet A, so sprechen wir von einem \textbf{diskreten Berechnungsproblem}. Sind D und E Teilmengen von $\R^m$ bzw. $\R^n$ für m, n $\in$ $\N$, so sprechen wir von einem \textbf{numerischen Berechnungsproblem}. Ein eindeutiges Berechnungsproblem $P\colon D \to E$  %$P : D \rightarrow E$% %sieht für mich gleich aus
+     Ein \textbf{Berechnungsproblem} ist eine Relation $P \subseteq D \times E$, wobei es zu jedem d $\in$ D mindestens ein e $\in$ E gibt mit $(d,e) \in $ P. Wenn $(d,e) \in$ P, dann ist e eine \textbf{korrekte Ausgabe} für das Problem P mit Eingabe d. Die Elemente von D heißen \textbf{Instanzen} des Problems. P heißt \textbf{eindeutig}, wenn P eine Funktion ist. Sind D, E Sprachen über einem endlichen Alphabet A, so sprechen wir von einem \textbf{diskreten Berechnungsproblem}. Sind D und E Teilmengen von  $\R^m$ bzw. $\R^n$ für $m, n \in \N $, so sprechen wir von einem \textbf{numerischen Berechnungsproblem}. Ein eindeutiges Berechnungsproblem $P \colon D \to E$
      mit $\left| E \right| = 2$ heißt \textbf{Entscheidungsproblem}. 
      % Buch Def. 1.6
 \end{definition}
 
-\section{Pseudocode}
+\end{frame}
 
-Algorithmen sollen Berechnungsprobleme lösen. Der Computer, der für die Ausführung am praktischsten ist, benötigt einen Maschinencode, Dieser ist für Menschen schwer lesbar. Deshalb nutzt man Programmiersprachen, die verständlich sind und mittels Compilers in einen Maschinencode übersetzt werden können. Es passieren also folgende Schritte:
-
-\begin{center}
+\begin{frame}{3 Pseudocode}
+    Algorithmen sollen Berechnungsprobleme lösen, heutzutage erfolgt die Ausführung mit Computern.
     
-\text{Algorithmus entwerfen} \\
-\rightarrow
-\text{wird in Computerprogramm (z.B. in C++) implementiert}\\
-\rightarrow
-\text{wird zu Maschinencode kompiliert}\\
-\rightarrow
-\text{Ausführung}
-
-\end{center}
-
-Eine übliche Möglichkeit, Algorithmen zu konkretisieren, sind sogenannte \textbf{Pseudocodes} - dieser ist für Menschen noch sehr verständlich und relativ leicht in eine Programmiersprache umzusetzen. Hier wird besonders die Idee des Algorithmus deutlich.
+    \begin{itemize}
+        \item Algorithmus entwerfen
+        \item wird in Computerprogramm (z.B. in C++) implementiert
+        \item wird zu Maschinencode kompiliert
+        \item Ausführung
+    \end{itemize}
 
 
-\section{Primzahltest}
+ \textbf{Pseudocode}: macht einen Algorithmus konkret in einer noch für Menschen verständlichen Sprache, und gleichzeitig leicht in eine Programmiersprache umsetzbar. Gut um Idee des Algorithmus darzustellen   
+\end{frame}
 
-\subsection{Idee des Algorithmus}
+\begin{frame}{4 Primzahltest - Was heißt prim?}
 
-Im Folgenden untersuchen wir, ob eine gegebene natürliche Zahl prim ist oder nicht. Dafür definieren wir zuerst, was überhaupt prim bedeutet.
+ Der Algorithmus soll herausfinden, ob eine gegebene natürliche Zahl \textbf{prim ist oder nicht}. 
 
-\begin{definition}
-    Eine natürliche Zahl n heißt prim, wenn n $\ge$ 2 ist und es keine natürliche Zahl a und b gibt mit a $>$ 1, b $>$ 1 und n = a $\cdot\,$ b
-\end{definition}
+ \vspace{0.5em}
 
-Das Entscheidungsproblem hier lautet \{$ (n,e) \in \N \times \{0,1\} | e = 1 \iff$ n prim\}.\\
-Eingabe: $n \in \N$. \\
-Frage: Ist n prim? \\
+   Entscheidungsproblem: \(
+   \{(n,e) \in \N \times \{ 0, 1\} | \, e= 1 \iff
+   \) n prim $\}$.
+   
+   \begin{definition}
+       Eine natürliche Zahl $n$ heißt prim, wenn \(
+       n \geq 2
+       \) ist und es keine natürliche Zahl $a$ und $b$ gibt mit \( a \geq 1, b \geq 1\) und $n= a \cdot b$
+   \end{definition}
 
-Dieses Problem soll mit einem Algorithmus gelöst werden, der sogenannte Primzahltest. Dies formulieren wir in einem Pseudocode. Zuvor führen wir noch einige Definition einen.
+  
+   
+    %\begin{thm}
+     %   First theorem
+    %\end{thm}
+\end{frame}
 
-\medskip
+\begin{frame}{4 Primzahltest - Code und Definition}
+    
+    \begin{itemize}
+        \item \textbf{If-Anweisung:} Führt Anweisungen abhängig vom Wahrheitswert einer Bedingung aus. Ist die Bedingung wahr, wird der \texttt{then}-Teil ausgeführt, andernfalls der \texttt{else}-Teil (optional)
+        \item \textbf{For-Anweisung:} Eine Variable durchläuft sukzessive Werte, und für jeden Wert wird ein Anweisungsblock ausgeführt.
+    \end{itemize}
 
-\textbf{If-Anweisung:}  
-Führt Anweisungen abhängig vom Wahrheitswert einer Bedingung aus. Ist die Bedingung wahr, wird der \texttt{then}-Teil ausgeführt, andernfalls der \texttt{else}-Teil (optional).
-
-\medskip
-
-\textbf{For-Anweisung:}  
-Eine Variable durchläuft sukzessive Werte, und für jeden Wert wird ein Anweisungsblock ausgeführt.
-
-
-\begin{definition}[Gaußklammern]
-Für $x \in \mathbb{R}$ definieren wir:
-\[
-\lfloor x \rfloor := \max \{ k \in \mathbb{Z} \mid k \le x \}, \quad
-\lceil x \rceil := \min \{ k \in \mathbb{Z} \mid k \ge x \}.
-\]
+\begin{definition} [Gaußklammern]
+Für \(
+x \in \R
+\) definieren wir:
+\(
+\lfloor x \rfloor := \max\{k \in \Z | k \leq x \}, \quad
+\lceil x \rceil := \min \{k \in \Z | k \geq x \}.
+\)
 \end{definition}
 
 \begin{definition}[Modulo-Operation]
-Für $a,b \in \mathbb{N}$ definieren wir:
-\[
-a \bmod b := a - b \cdot \left\lfloor \frac{a}{b} \right\rfloor.
-\]
-Es gilt:
-\[
-b \mid a \;\Longleftrightarrow\; a \bmod b = 0.
-\]
+Für $a,b \in \N$ definieren wir:
+\(
+a \bmod b := a - b \cdot \lfloor \frac{a}{b} \rfloor .
+\)
+Es gilt
+\(
+b | a \iff a \bmod b = 0.
+\)
+    
 \end{definition}
+\end{frame}
 
+\begin{frame}{4 Primzahltest - Algorithmus}
+   [Hier ist der erste Algorithmus]
+\end{frame}
 
-\begin{algorithm}
-\caption{Einfacher Primzahltest}
-\begin{algorithmic}[1]
-\Require $n \in \mathbb{N}$
-\Ensure Antwort auf die Frage, ob $n$ prim ist
-\If{$n = 1$}
-    \State $\text{antwort} \gets \text{``nein''}$
-\Else
-    \State $\text{antwort} \gets \text{``ja''}$
-    \For{$i \gets 2$ \textbf{to} $\lfloor \sqrt{n} \rfloor$}
-        \If{$i \mid n$}
-            \State $\text{antwort} \gets \text{``nein''}$
-        \EndIf
-    \EndFor
-\EndIf
-\State \Return $\text{antwort}$
-\end{algorithmic}
-\end{algorithm}
+\begin{frame}{5 Sieb des Eratosthenes – Überblick}
+\begin{itemize}
+    \item Algorithmus
+    \item Beweis
+\end{itemize}
+\end{frame}
 
-Anstelle von $\sqrt{n}$ kann man die Schleifenbedingung auch als $i \cdot i \le n$ formulieren, um Wurzelberechnungen zu vermeiden.\\
+\subsection{Algorithmus}
+\begin{frame}{5 Sieb des Eratosthenes - Algorithmus}
 
-Der Algorithmus terminiert für alle $n \in \mathbb{N}$, d.\,h. er berechnet die Funktion
-\[
-f(n) =
-\begin{cases}
-\text{ja}, & \text{falls $n$ prim ist},\\
-\text{nein}, & \text{sonst}.
-\end{cases}
-\]
+Nach Eingabe einer natürlichen Zahl n besteht die Aufgabe darin, alle Primzahlen p mit p $\le$ n zu berechnen. Der Algorithmus lautet wie folgt:
 
+[Algorithmus 2]
+    
+\end{frame}
 
-\section{Sieb des Eratosthenes}
-
-Im nächsten Abschnitt betrachten wir ein Beispiel für ein allgemeineres diskretes Berechnungsproblem: \textbf{das Sieb des Eratosthenes}. Nach Eingabe einer natürlichen Zahl n besteht die Aufgabe darin, alle Primzahlen p mit p $\le$ n zu berechnen. Der Algorithmus lautet wie folgt:\\
-
-Eingabe: n $\in \N$ \\
-Ausgabe: alle Primzahlen, die nicht größer als n sind.\\
-
-\[
-\begin{aligned}
-\textbf{for } & i \leftarrow 2 \textbf{ to } n \textbf{ do } p[i] \leftarrow \text{``ja''} \\
-\textbf{for } & i \leftarrow 2 \textbf{ to } n \textbf{ do } \\
-& \quad \textbf{if } p[i] = \text{``ja''} \textbf{ then} \\
-& \quad \quad \textbf{output } i \\
-& \quad \quad \textbf{for } j \leftarrow i \textbf{ to } \frac{n}{i} \textbf{ do } \\
-& \quad \quad \quad p[i \cdot j] \leftarrow \text{``nein''}
-\end{aligned}
-\]
-
+\begin{frame}[allowframebreaks]{5 Sieb des Eratosthenes}
 \begin{thm}
    Obiger Algorithmus ist korrekt.
 \end{thm}
 
-\begin{proof}
 Wir zeigen die Korrektheit des Algorithmus. Dazu beweisen wir für alle 
 \( k \in \{2, \dots, n\} \):
-\[
+
+\textbf{\[
 k \text{ wird genau dann ausgegeben, wenn } k \text{ prim ist.}
-\]
-Dies zeigen wir durch das Beweisen in beide Richtungen.
+\]}
+Dies beweisen wir indem wir folgende 2 Aussagen beweisen
+
+\begin{itemize}
+    \item Ist k prim, so wird k ausgegeben (1)
+    \item Ist k nicht prim, so wird k nicht ausgegeben (2)
+\end{itemize}
 \medskip
+\end{frame}
+
+\subsection{Beweis}
+\begin{frame}{5 Sieb des Eratosthenes}
 
 \textbf{(1) Ist \(k\) prim, so wird \(k\) ausgegeben.}
 
-Sei \(k \in \{2, \dots, n\}\) eine Primzahl. 
-
-Im Algorithmus wird eine Zahl \(k\) genau dann nicht ausgegeben, wenn irgendwann 
+Sei \(k \in \{2, \dots, n\}\) eine Primzahl. Im Algorithmus wird eine Zahl \(k\) genau dann nicht ausgegeben, wenn irgendwann 
 \(p[k] \leftarrow \text{``nein''}\) gesetzt wird. Wir zeigen, dass dies für Primzahlen nicht passiert.
 
 Die Zuweisung \(p[k] \leftarrow \text{``nein''}\) erfolgt nur dann, wenn es Zahlen 
-\(i, j \in \mathbb{N}\) mit \(i \ge 2\), \(j \ge i\) gibt, sodass
-\[
-k = i \cdot j.
-\]
-Das bedeutet aber, dass \(k\) als Produkt zweier Zahlen größer oder gleich 2 dargestellt werden kann. 
-Dies widerspricht der Annahme, dass \(k\) prim ist.
+\(i, j \in \mathbb{N}\) mit \(i \ge 2\), \(j \ge i\) gibt, sodass \[k = i \cdot j.\]
+Das bedeutet aber, dass \(k\) als Produkt zweier Zahlen größer oder gleich 2 dargestellt werden kann. Dies widerspricht der Annahme, dass \(k\) prim ist.
+Also wird für eine Primzahl \(k\) niemals \(p[k] = \text{``nein''}\) gesetzt. Somit gilt während des gesamten Algorithmus: \[p[k] = \text{``ja''}.\] Folglich wird \(k\) ausgegeben.
+\end{frame}
 
-Also wird für eine Primzahl \(k\) niemals \(p[k] = \text{``nein''}\) gesetzt. Somit gilt während des gesamten Algorithmus:
-\[
-p[k] = \text{``ja''}.
-\]
-Folglich wird \(k\) ausgegeben.
 
-\medskip
+\begin{frame}{5 Sieb des Eratosthenes}
 
-\textbf{(2) Ist \(k\) nicht prim, so wird \(k\) nicht ausgegeben.}
+ \textbf{(2) Ist \(k\) nicht prim, so wird \(k\) nicht ausgegeben.}
 
 Sei nun \(k \in \{2, \dots, n\}\) keine Primzahl. Dann ist \(k\) zusammengesetzt, 
 also existieren Zahlen \(i, j \in \mathbb{N}\) mit
@@ -246,7 +241,11 @@ Teiler besitzen. Also ist \(i\) eine Primzahl.
 
 Nach Teil (1) wissen wir, dass für Primzahlen stets \(p[i] = \text{``ja''}\) gilt, 
 wenn der Algorithmus die Zahl \(i\) betrachtet.
+    
+\end{frame}
 
+
+\begin{frame}{5 Sieb des Eratosthenes}
 In diesem Schritt führt der Algorithmus die innere Schleife aus und setzt für alle 
 geeigneten \(j\):
 \[
@@ -257,7 +256,6 @@ Da \(k = i \cdot j\), wird insbesondere auch
 p[k] \leftarrow \text{``nein''}
 \]
 gesetzt.
-
 Ab diesem Zeitpunkt bleibt \(p[k] = \text{``nein''}\), da dieser Wert im Algorithmus 
 nicht mehr geändert wird.
 
@@ -270,16 +268,26 @@ und somit wird \(k\) nicht ausgegeben.
 \medskip
 
 Damit ist die Korrektheit des Algorithmus gezeigt.
-\end{proof}
+\hfill$\square$
 
+\end{frame}
 
-\section{Nicht alles ist berechenbar: Das Halteproblem}
+\begin{frame}{6 Halteproblem – Überblick}
+\begin{itemize}
+    \item Kodierung von Wörtern (Lemma)
+    \item Abzählbarkeit von Programmen
+    \item Existenz nicht berechenbarer Funktionen
+    \item Definition der Haltefunktion
+    \item Widerspruchsbeweis
+\end{itemize}
+\end{frame}
 
-Das Halteproblem ist das Beispiel dafür, dass man mit Algorithmen nicht alles berechnen kann. 
-Zunächst wollen wir zeigen, dass alle Sprachen, also auch Programme, abzählbar sind.
-Dafür benötigen wir:
+   \subsection{Kodierung von Wörtern}
+\begin{frame}{6 Halteproblem}
 
-\begin{lem}
+    Zunächst benötigen wir einige Vorarbeit.
+
+    \begin{lem}
     Seien $k,l \in \mathbb{N}$. Definiere die Abbildung
     \[ 
     f^l: \{0,\dots,k-1\}^l \to \{0,\dots,k^l-1\}, \quad
@@ -288,21 +296,13 @@ Dafür benötigen wir:
    für alle \( w = a_1,\dots,a_l \in \{0,...,k-1\}^l \).
     Dann ist die Abbildung $f^l$ wohldefiniert und bijektiv.
 \end{lem}
+\end{frame}
 
-Die Grundidee des Lemmas lässt sich mit diesem Beispiel veranschaulichen. Wenn wir die Zahl 257 betrachten, verstehen wir darunter die Summe $2\cdot 10^2 + 5\cdot 10^1 + 7 \cdot 10^0$. Genau das macht die Abbildung $f^l$ für jede Basis k. In dem gerade betrachteten Beispiel, also unseren normalen Zählsystem rechnen wir mit der Basis 10 und haben Ziffern von 0 bis 9.
+\begin{frame}{6  Halteproblem}
+\begin{block}{Beweis X}
+    
 
-Machen wir ein genaueres Beispiel: \( k=2, l=3
-\)
-Die möglichen Tupel sind \( (0,0,0), (0,0,1), (0,1,0), (0,1,1), (1,0,0), (1,0,1), (1,1,0), (1,1,1) \). Wendet man nun $f^3$ an, so ergibt sich zum Beispiel für das konkrete Tupel (0,1,1) der Wert \(
-0 \cdot 4 + 1 \cdot 2 + 1 \cdot 1 = 3
-\). Jedem Tupel wird also eine Zahl, von 0 bis 7 zugewiesen.\\
-
-Die Bijektivität bedeutet also, dass eine Zahl zwischen 0 und $k^l-1$ dasselbe ist wie eine Folge von l Ziffern zur Basis k.\\
-
-Dieses Lemma wollen wir nun beweisen.\\
-
-\begin{proof}
-\textbf{1. Wohldefiniertheit:}
+    \textbf{1. Wohldefiniertheit:}
 
 Sei $(a_1,\dots,a_l) \in \{0,\dots,k-1\}^l$. Dann gilt für alle $i$:
 \[
@@ -321,19 +321,25 @@ Die rechte Summe ist eine geometrische Reihe:
 \[
 \sum_{i=1}^l (k-1)k^{l-i}
 = (k-1)\sum_{i=1}^l{k^{l-i}}
-= (k-1)\sum_{i=0}^{l-1}{k^{l-i-1}}
+= (k-1)\sum_{i=0}^{l-1}{k^{l-i-1}} \]
+\[
 = (k-1)\sum_{j=0}^{l-1} k^j
 = (k-1)\cdot \frac{k^l - 1}{k-1}
 = k^l - 1.
 \]
-Also gilt insgesamt
+\end{block}
+\end{frame}
+
+\begin{frame}{6 Halteproblem}
+    Also gilt insgesamt
 \[
 0 \le f_l(a_1,\dots,a_l) \le k^l - 1,
 \]
 und damit ist $f_l$ wohldefiniert.
+\end{frame}
 
-\vspace{0.5em}
-\textbf{2. Injektivität:}
+\begin{frame}{6 Halteproblem}
+    \textbf{2. Injektivität:}
 
 Seien $(a_1,\dots,a_l),(b_1,\dots,b_l) \in \{0,\dots,k-1\}^l$ mit
 \[
@@ -346,7 +352,6 @@ a_j \ne b_j.
 \]
 Ohne Einschränkung sei $a_j > b_j$.
 
-Wir betrachten die Differenz:
 \[
 f^l(a_1,\dots,a_l) - f^l(b_1,\dots,b_l)
 = \sum_{i=1}^l (a_i - b_i)k^{l-i}.
@@ -355,6 +360,11 @@ Für $i<j$ gilt $a_i = b_i$, also verschwinden diese Terme:
 \[
 = (a_j - b_j)k^{l-j} + \sum_{i=j+1}^l (a_i - b_i)k^{l-i}.
 \]
+\end{frame}
+
+\begin{frame}{6 Halteproblem}
+    Wir betrachten die Differenz:
+
 
 Nun schätzen wir die Summe für $i>j$ nach unten ab. Da $a_i,b_i \in \{0,\dots,k-1\}$ gilt
 \[
@@ -376,6 +386,10 @@ Damit folgt
 \ge -(k^{l-j} - 1).
 \]
 
+\end{frame}
+
+\begin{frame}{6 Halteproblem}
+    
 Zusammen ergibt sich:
 \[
 f^l(a_1,\dots,a_l) - f^l(b_1,\dots,b_l)
@@ -391,7 +405,10 @@ f^l(a_1,\dots,a_l) > f^l(b_1,\dots,b_l).
 \]
 Also ist $f^l$ injektiv.
 
-\vspace{0.5em}
+\end{frame}
+
+\begin{frame}{6 Halteproblem}
+
 \textbf{3. Surjektivität:}
 
 Die Mengen haben dieselbe Mächtigkeit:
@@ -400,22 +417,33 @@ Die Mengen haben dieselbe Mächtigkeit:
 \]
 
 Die linke Menge besteht aus allen Tupeln der Länge l. Für jede Position gibt es k verschiedene Möglichkeiten. Die Anzahl ergibt sich also als Produkt $k\cdot k\cdot k \dots k = k^l$. Die rechte Menge besteht einfach aus allen Zahlen von 0 bis $k^l-1$, weist also auch die Anzahl $k^l$ auf (am Ende zieht man zwar 1 ab, fängt aber mit 0 an).
+\hfill$\square$
+    
+\end{frame}
 
+\begin{frame}{6 Halteproblem}
 
 Da $f^l$ eine injektive Abbildung zwischen zwei endlichen Mengen gleicher Größe ist, ist sie automatisch auch surjektiv.
 
 \vspace{0.5em}
 
-$f^l$ ist somit bijektiv.
-\end{proof}    
+$f^l$ ist somit bijektiv. $\qed$
+    
+\end{frame}
 
-%%Hier kommt nun schwieriger Beweis von Satz 1.20 (buch)
+\subsection{Abzählbarkeit}
+\begin{frame}{6 Halteproblem}
 
-\begin{thm}
+    \begin{thm}
     Sei A eine nichtleere Menge. Dann ist die Menge $A^*$ abzählbar.
 \end{thm}
-
+\vspace{0.5em}
 Der Beweis wird in Folge nur skizziert:
+\end{frame}
+
+\begin{frame}{6 Halteproblem}
+
+    
 
 \begin{proof}[Beweisskizze]
 Die Idee des Beweises besteht darin, die Wörter aus $A^*$ systematisch zu nummerieren.
@@ -428,7 +456,9 @@ Durch diese Kodierung erhält man eine injektive Abbildung von $A^*$ nach $\N$, 
 
 Damit ist $A^*$ abzählbar.
 \end{proof}
+\end{frame}
 
+\begin{frame}{6 Halteproblem}
 
 \begin{cor}
 \label{abzählbar}
@@ -437,14 +467,16 @@ Damit ist $A^*$ abzählbar.
 
 \begin{proof}
     C++-Programme sind Wörter über einem endlichen Alphabet. Die zu zeigende Aussage folgt also aus Satz \ref{abzählbar}.
-\end{proof}
+\end{proof}    
+\end{frame}
 
+\begin{frame}{6 Halteproblem}
 \begin{thm}
     Es gibt Funktionen \(f: \N\to \{0,1\} \), die von keinem C++-Programm berechnet werden.
 
 \end{thm}
 
-\begin{proof}
+\begin{block}{Beweis X}
     Sei $\mathcal{P}$ die nach Korrolar \ref{abzählbar} abzählbare Menge der C++-Programme, die eine Funktion \(f: \N\to \{0,1\} \) berechnen.
 
     Sei \(g: \mathcal{P}\to \{0,1\} \) eine injektive Funktion. 
@@ -459,78 +491,117 @@ Damit ist $A^*$ abzählbar.
     P \in \mathcal{P}
     \), und somit wird f von keinem C++ Programm berechnet.
 
-    \end{proof}
+    \end{block}
+\end{frame}
 
+\subsection{Halteproblem}
+\begin{frame}{6 Halteproblem}
 Unter den nicht berechenbaren Funktionen geht es nun um das berühmteste Beispiel, dem \textbf{Halteproblem}: Es gibt kein Programm, dass für alle Programme und Eingaben entscheiden kann, ob das Programm terminiert.
 
 \medskip
 
-Wir betrachten die natürlichen Zahlen $\N$ und die Menge aller Programme Q. Da Programme endliche Texte darstellen, können wir alle Programme durchnummerieren. Es gibt also eine surjektive Funktion \(g: \N \to Q \) - jede Zahl kodiert ein Programm.
+Wir betrachten die natürlichen Zahlen $\N$ und die Menge aller Programme $Q$. Da Programme endliche Texte darstellen, können wir alle Programme durchnummerieren. Es gibt also eine surjektive Funktion \(g: \N \to Q \) - jede Zahl kodiert ein Programm.
 Genauso geht die Kodierung auch in die andere Richtung, jedes Programm kodiert eine Zahl: \( f: Q \to \N
 \). Jedem Programm wird eine Zahl zugeordnet.
+\end{frame}
 
-\medskip
-
+\begin{frame}{6 Halteproblem}
 Wir definieren die Funktion wie folgt:
 \begin{align}
-    h: \N \times \N \to \{1,0\}\\
+    h: \N \times \N \to \{1,0\}
 \end{align}
 
 \begin{align}
     h(x,y) = \begin{cases}
-        1,& \text{wenn Programm g(x) bei Eingabe y hält}\\
+        1,& \text{wenn Programm g(x) bei Eingabe y terminiert}\\
         0,& \text{sonst}
     \end{cases}
 \end{align}
 
-x: Nummer eines Programms; y: Eingabe; h(x,y) sagt ob Programm stoppt oder nicht.\\
+x: Nummer eines Programms; y: Eingabe; h(x,y) sagt ob Programm terminiert oder nicht.
+
+\medskip
 
 Diese Funktion heißt \textbf{Haltefunktion} und ihr zugehöriges Entscheidungsproblem heißt \textbf{Halteproblem}.
+\end{frame}
 
+\subsection{Widerspruchsbeweis}
+\begin{frame}{6 Halteproblem}
 \begin{thm}
     Die Haltefunktion wird von keinem C++ Programm berechnet. Das heißt es existiert kein Programm das $h$ berechnet.
 \end{thm}
 
-\begin{proof}
+\begin{block}[Beweis X]
     Die Beweisidee ist ein Widerspruchsbeweis.
     
-    Angenommen, es existiert ein Programm P, das h(x,y) korrekt berechnet. Wir konstruieren ein neues Programm Q, das wie folgt funktioniert:
+    Angenommen, es existiert ein Programm $P$, das $h(x,y)$ korrekt berechnet. Wir konstruieren ein neues Programm $Q$, das wie folgt funktioniert:
 
     Bei Eingabe $x \in \N$:
     \begin{enumerate}
         \item Berechne h(x,x)
-        \item Falls \(h(x,x) = 0 \rightarrow \) halte
-        \item falls \(h(x,x) = 1\rightarrow \) laufe unendlich weiter 
+        \item Falls \(h(x,x) = 0 \rightarrow \) terminiert
+        \item falls \(h(x,x) = 1\rightarrow \) terminiert nicht 
     \end{enumerate}
     
    
-    Es passiert also genau das Gegenteil von dem, was h voraussagt.
+    \begin{block}{Schlüsselidee}
+Es passiert genau das \alert{Gegenteil} von dem, was \( h \) vorhersagt.
+\end{block}
+    \end{block}
+\end{frame}
 
-    Da Q ein Programm ist und jedes Programm eine Nummer hat, gibt es ein q mit \( g(q) = Q\).
+\begin{frame}{6 Halteproblem}
 
-    Nun betrachten wir h(q,q).
-    \paragraph{Fall 1:} Betrachte h(q,q) = 1. 
-    Q(q) hält aber nach Definition von Q läuft es unendlich weiter.
 
-    \paragraph{Fall 2:} Betrachte h(q,q) = 0.
-    Q(q) läuft unendlich weiter aber nach Definition von Q müsste es halten.
+   Da $Q$ ein Programm ist und jedes Programm eine Nummer hat, gibt es ein $q$ mit \( g(q) = Q\).
+
+    Nun betrachten wir $h(q,q)$.
+    \begin{itemize}
+        \item \textbf{Fall 1:} Betrachte \(h(q,q) = 1\). 
+    $Q(q)$ terminiert, aber nach Definition von $Q$ terminiert es nicht.
+         \item \textbf{Fall 2:} Betrachte \(h(q,q) = 0\).
+    $Q(q)$ terminiert es nicht, aber nach Definition von $Q$ müsste es terminieren.
+
+    \end{itemize}
+    
 \medskip
 
     In beiden Fällen entsteht also ein Widerspruch. Also war die Annahme falsch. Die Haltefunktion ist somit nicht berechenbar.
-\end{proof}
+    \vspace{0.5em}
 
-Man sagt dazu: das Halteproblem ist $\textbf{nicht entscheidbar}$.
+Man sagt dazu: das Halteproblem ist \textbf{nicht entscheidbar}. \hfill$\square$
+\end{frame}
 
-\subsection{Collatz-Folge
-}
+\begin{frame}{6 Halteproblem}
 Ein gutes Beispiel für ein Programm, bei dem nicht leicht zu sehen ist, ob es hält, ist die \textbf{Collatz-Folge}. Der Algorithmus funktioniert wie folgt:
-Nach Eingabe von \(n \in \N \) wird berechnet, ob die Collatz-Folge von n den Wert 1 erreicht. Dabei geht das Prgraomm wie folgt vor. Wenn n eine gerade Zahl ist, so wird n halbiert. Ansonsten wird es verdreifacht und um 1 erhöht. Dies wiederholt sich bis die Collatz-Folge den Wert 1 erreicht. Bis heute konnte nicht erfasst werden, ob dieser Algortihmus immer, also für jedes n, hält.
+Nach Eingabe von \(n \in \N \) wird berechnet, ob die Collatz-Folge von n den Wert 1 erreicht. Dabei geht das Programm wie folgt vor. Wenn n eine gerade Zahl ist, so wird n halbiert. Ansonsten wird es verdreifacht und um 1 erhöht. Dies wiederholt sich bis die Collatz-Folge den Wert 1 erreicht. Bis heute konnte nicht erfasst werden, ob dieser Algorithmus immer, also für jedes n, hält.
+
+\end{frame}
+
+\begin{frame}{Literatur}
+
+\textbf{Hauptquelle:}
+
+\begin{itemize}
+    \item B. H. Hougardy: \\
+    \textit{Algorithmische Mathematik} \\
+    Springer, 2010
+\end{itemize}
+
+\vspace{1em}
+
+\textbf{Bemerkung:}
+\begin{itemize}
+    \item Grundlage für alle Definitionen und Beweise
+    \item Einige Beweisschritte wurden im Vortrag ausführlicher dargestellt
+\end{itemize}
+
+\end{frame}
 
 
 
-
-
-\bibliographystyle{plain}
-\bibliography{bibliography.bib}
 
 \end{document}
+
+
+%Useful: \hfill$\square$ für qed kästchen
