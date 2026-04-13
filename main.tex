@@ -1,21 +1,25 @@
-%\usepackage{graphicx} % Required for inserting images
-%\date{April 2026}
 
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
-\usepackage{german}
+\usepackage{german} %ersetze ich durch babel, weil das besser sein soll
+%\usepackage[ngerman]{babel}
+%\usepackage{hyphenat} %vonmir um microtype zu nutzen
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
-\usepackage{url}
+\usepackage{url} %ersetze ich nicht durch hyperref
+%\usepackage{hyperref} %zuviele Links auf die man klicken kann
+
 
 \usepackage{algorithm} %vonmir
-\usepackage{algpseudocode} %vonmir
+\usepackage[noend]{algpseudocode} %vonmir; noend hilft das kein endif endfor am Ende dasteht
+\usepackage{microtype} %vonmir
 
 \newcommand{\R}{\mathbb{R}}% reele Zahlen
 \newcommand{\C}{\mathbb{C}}% komplexe Zahlen
 \newcommand{\Q}{\mathbb{Q}}% rationale Zahlen
 \newcommand{\N}{\mathbb{N}}% natürliche Zahlen % von mir
+
 
 
 \newtheorem{thm}{Satz}
@@ -28,7 +32,7 @@
 \begin{document} %war vorher nach author, aber overleaf beschwerte sich
 
 \title{Primzahltest und Berechenbarkeit}
-\date{\today}
+\date{\today} %\date{April 2026}
 \author{Jana Chung\\ \url{jana.chung@uni-bielefeld.de}}
 
 
@@ -36,12 +40,11 @@
 
 \begin{center}
       Die vorliegende Ausarbeitung orientiert sich in Aufbau und Inhalt 
-maßgeblich an dem Lehrbuch \cite{HougardyVygen2018}. 
+maßgeblich an dem Lehrbuch \cite{Hougardy}. 
 \end{center}
   
 
-
-\newpage
+%\newpage
 \section{Was ist ein Algorithmus}
 
 Ein Algorithmus ist eine endliche, wohldefinierte Folge von Anweisungen, die für jede zulässige Eingabe nach endlich vielen Schritten terminiert und eine Ausgabe liefert. 
@@ -52,16 +55,15 @@ Relevant sind folgende Aspekte:
     \item Wann stoppt der Algorithmus? Was wird dann ausgegeben?
 \end{itemize}
 
-Algorithmen können von Menschen ausgeführt werden (z.B. Gauß-Elimination), in Hardwares implementiert werden oder in Software (d.h. als Computerprogramm in der Programmiersprache) geschrieben werden.
+Algorithmen können von Menschen ausgeführt werden, in Hardwares implementiert werden oder in Software (d.h. als Computerprogramm in der Programmiersprache) geschrieben werden.
 
 
 \section{Berechnungsprobleme}
 
 Durch eine Funktion $f\colon A \to B$  können wir ausdrücken, dass ein Computerprogramm bei Eingabe \(a \in A\) das Ergebnis \(f(a) \in B\) ausgibt. Da Computer meist intern nur mit Nullen und Einsen rechnen, erlauben wir als Ein- und Ausgabe andere Zeichenketten.
 
-\begin{definition}
-    
-Sei A eine nichtleere endliche Menge. Für $k \in \N \cup \{0\}$ bezeichnen wir mit $A^k$ die Menge der Funktionen $f: {1,\dots,k}] \rightarrow A$.
+\begin{definition}   
+Sei A eine nichtleere endliche Menge. Für $k \in \N \cup \{0\}$ bezeichnen wir mit $A^k$ die Menge der Funktionen $f: \{1,\dots,k\} \rightarrow A$.
 Ein Element f $\in A^k$ heißt \textbf{Wort / Zeichenkette} der \textbf{Länge} k über dem \textbf{Alphabet} A. Wir schreiben es als Folge $f(1)... f(k)$.  
 Das einzige Element $\emptyset$ von $A^0$ nennen wir das \textbf{leere Wort} (mit Länge 0). Wir setzen $A^\ast:= \bigcup_{k\in \N \cup \{0\}}^{} A^k$.
 Eine \textbf{Sprache} über dem Alphabet A ist eine Teilmenge von $A^\ast$.
@@ -71,7 +73,7 @@ Eine \textbf{Sprache} über dem Alphabet A ist eine Teilmenge von $A^\ast$.
 Auf dieser Definition baut die folgende auf: 
 
 \begin{definition}
-     Ein \textbf{Berechnungsproblem} ist eine Relation $P \subseteq D \times$ E, wobei es zu jedem d $\in$ D mindestens ein e $\in$ E gibt mit $(d,e) \in $ P. Wenn $(d,e) \in$ P, dann ist e eine \textbf{korrekte Ausgabe} für das Problem P mit Eingabe d. Die Elemente von D heißen \textbf{Instanzen} des Problems. P heißt \textbf{eindeutig}, wenn P eine Funktion ist. Sind D, E Sprachen über einem endlichen Alphabet A, so sprechen wir von einem \textbf{diskreten Berechnungsproblem}. Sind D und E Teilmengen von $\R^m$ bzw. $\R^n$ für m, n $\in$ $\N$, so sprechen wir von einem \textbf{numerischen Berechnungsproblem}. Ein eindeutiges Berechnungsproblem $P\colon D \to E$  %$P : D \rightarrow E$% %sieht für mich gleich aus
+     Ein \textbf{Berechnungsproblem} ist eine Relation $P \subseteq D \times E$, wobei es zu jedem d $\in$ D mindestens ein e $\in$ E gibt mit $(d,e) \in $ P. Wenn $(d,e) \in$ P, dann ist e eine \textbf{korrekte Ausgabe} für das Problem P mit Eingabe d. Die Elemente von D heißen \textbf{Instanzen} des Problems. P heißt \textbf{eindeutig}, wenn P eine Funktion ist. Sind D, E Sprachen über einem endlichen Alphabet A, so sprechen wir von einem \textbf{diskreten Berechnungsproblem}. Sind D und E Teilmengen von $\R^m$ bzw. $\R^n$ für m, n $\in$ $\N$, so sprechen wir von einem \textbf{numerischen Berechnungsproblem}. Ein eindeutiges Berechnungsproblem $P\colon D \to E$  %$P : D \rightarrow E$% %sieht für mich gleich aus
      mit $\left| E \right| = 2$ heißt \textbf{Entscheidungsproblem}. 
      % Buch Def. 1.6
 \end{definition}
@@ -83,16 +85,16 @@ Algorithmen sollen Berechnungsprobleme lösen. Der Computer, der für die Ausfü
 \begin{center}
     
 \text{Algorithmus entwerfen} \\
-\rightarrow
+$\rightarrow$
 \text{wird in Computerprogramm (z.B. in C++) implementiert}\\
-\rightarrow
+$\rightarrow$
 \text{wird zu Maschinencode kompiliert}\\
-\rightarrow
+$\rightarrow$
 \text{Ausführung}
 
 \end{center}
 
-Eine übliche Möglichkeit, Algorithmen zu konkretisieren, sind sogenannte \textbf{Pseudocodes} - dieser ist für Menschen noch sehr verständlich und relativ leicht in eine Programmiersprache umzusetzen. Hier wird besonders die Idee des Algorithmus deutlich.
+Eine übliche Möglichkeit, Algorithmen zu konkretisieren, sind sogenannten \textbf{Pseudocodes} - dieser ist für Menschen noch sehr verständlich und relativ leicht in eine Programmiersprache umzusetzen. Hier wird besonders die Idee des Algorithmus deutlich.
 
 
 \section{Primzahltest}
@@ -105,11 +107,18 @@ Im Folgenden untersuchen wir, ob eine gegebene natürliche Zahl prim ist oder ni
     Eine natürliche Zahl n heißt prim, wenn n $\ge$ 2 ist und es keine natürliche Zahl a und b gibt mit a $>$ 1, b $>$ 1 und n = a $\cdot\,$ b
 \end{definition}
 
-Das Entscheidungsproblem hier lautet \{$ (n,e) \in \N \times \{0,1\} | e = 1 \iff$ n prim\}.\\
-Eingabe: $n \in \N$. \\
-Frage: Ist n prim? \\
+Das Entscheidungsproblem hier lautet 
 
-Dieses Problem soll mit einem Algorithmus gelöst werden, der sogenannte Primzahltest. Dies formulieren wir in einem Pseudocode. Zuvor führen wir noch einige Definition einen.
+\{$ (n,e) \in \N \times \{0,1\} | e = 1 \iff$ n prim\}.
+\medskip
+
+Eingabe: $n \in \N$.
+
+Frage: Ist n prim?
+
+\medskip
+
+Dieses Problem soll mit einem Algorithmus gelöst werden, dem sogenannte Primzahltest. Diesen formulieren wir in einem Pseudocode. Zuvor erklären wir Code-Anweisungen und führen noch einige Definition ein.
 
 \medskip
 
@@ -123,7 +132,7 @@ Eine Variable durchläuft sukzessive Werte, und für jeden Wert wird ein Anweisu
 
 
 \begin{definition}[Gaußklammern]
-Für $x \in \mathbb{R}$ definieren wir:
+Für $x \in \R$ definieren wir:
 \[
 \lfloor x \rfloor := \max \{ k \in \mathbb{Z} \mid k \le x \}, \quad
 \lceil x \rceil := \min \{ k \in \mathbb{Z} \mid k \ge x \}.
@@ -161,7 +170,9 @@ b \mid a \;\Longleftrightarrow\; a \bmod b = 0.
 \end{algorithmic}
 \end{algorithm}
 
-Anstelle von $\sqrt{n}$ kann man die Schleifenbedingung auch als $i \cdot i \le n$ formulieren, um Wurzelberechnungen zu vermeiden.\\
+Anstelle von $\sqrt{n}$ kann man die Schleifenbedingung auch als $i\, \cdot \, i \le n$ formulieren, um Wurzelberechnungen zu vermeiden.
+
+\medskip
 
 Der Algorithmus terminiert für alle $n \in \mathbb{N}$, d.\,h. er berechnet die Funktion
 \[
@@ -175,33 +186,48 @@ f(n) =
 
 \section{Sieb des Eratosthenes}
 
-Im nächsten Abschnitt betrachten wir ein Beispiel für ein allgemeineres diskretes Berechnungsproblem: \textbf{das Sieb des Eratosthenes}. Nach Eingabe einer natürlichen Zahl n besteht die Aufgabe darin, alle Primzahlen p mit p $\le$ n zu berechnen. Der Algorithmus lautet wie folgt:\\
+Im nächsten Abschnitt betrachten wir ein Beispiel für ein allgemeineres diskretes Berechnungsproblem: \textbf{das Sieb des Eratosthenes}. Nach Eingabe einer natürlichen Zahl n besteht die Aufgabe darin, alle Primzahlen p mit p $\le$ n zu berechnen. Der Algorithmus lautet wie folgt:
 
-Eingabe: n $\in \N$ \\
-Ausgabe: alle Primzahlen, die nicht größer als n sind.\\
 
-\[
-\begin{aligned}
-\textbf{for } & i \leftarrow 2 \textbf{ to } n \textbf{ do } p[i] \leftarrow \text{``ja''} \\
-\textbf{for } & i \leftarrow 2 \textbf{ to } n \textbf{ do } \\
-& \quad \textbf{if } p[i] = \text{``ja''} \textbf{ then} \\
-& \quad \quad \textbf{output } i \\
-& \quad \quad \textbf{for } j \leftarrow i \textbf{ to } \frac{n}{i} \textbf{ do } \\
-& \quad \quad \quad p[i \cdot j] \leftarrow \text{``nein''}
-\end{aligned}
-\]
+\begin{algorithm}
+\caption{Sieb des Eratosthenes}
+\begin{algorithmic}[2]
+
+\Require $n \in \N$
+\Ensure alle Primzahlen, die nicht größer als n sind
+
+%reihenfolge ist HIER VERTAUSCHT;
+\For{$i \gets 2$ \textbf{to} $n$} 
+$p[i] \gets \text{``ja''}$ 
+\EndFor
+
+\For{$i \gets 2$ \textbf{to} $n$}
+    \If{$p[i] = \text{``ja''}$}
+    \State \Return $i$ 
+    \For{$j \gets i$ \textbf{to} $\lfloor \frac{n}{i} \rfloor$}
+    \State $p[i \cdot j] \gets \text{``nein''}$. 
+    \EndFor
+    \EndIf
+    \EndFor
+
+
+
+\end{algorithmic}
+\end{algorithm}
+
 
 \begin{thm}
    Obiger Algorithmus ist korrekt.
 \end{thm}
 
 \begin{proof}
+    
 Wir zeigen die Korrektheit des Algorithmus. Dazu beweisen wir für alle 
 \( k \in \{2, \dots, n\} \):
 \[
 k \text{ wird genau dann ausgegeben, wenn } k \text{ prim ist.}
 \]
-Dies zeigen wir durch das Beweisen in beide Richtungen.
+
 \medskip
 
 \textbf{(1) Ist \(k\) prim, so wird \(k\) ausgegeben.}
@@ -270,6 +296,7 @@ und somit wird \(k\) nicht ausgegeben.
 \medskip
 
 Damit ist die Korrektheit des Algorithmus gezeigt.
+
 \end{proof}
 
 
@@ -291,17 +318,25 @@ Dafür benötigen wir:
 
 Die Grundidee des Lemmas lässt sich mit diesem Beispiel veranschaulichen. Wenn wir die Zahl 257 betrachten, verstehen wir darunter die Summe $2\cdot 10^2 + 5\cdot 10^1 + 7 \cdot 10^0$. Genau das macht die Abbildung $f^l$ für jede Basis k. In dem gerade betrachteten Beispiel, also unseren normalen Zählsystem rechnen wir mit der Basis 10 und haben Ziffern von 0 bis 9.
 
-Machen wir ein genaueres Beispiel: \( k=2, l=3
-\)
-Die möglichen Tupel sind \( (0,0,0), (0,0,1), (0,1,0), (0,1,1), (1,0,0), (1,0,1), (1,1,0), (1,1,1) \). Wendet man nun $f^3$ an, so ergibt sich zum Beispiel für das konkrete Tupel (0,1,1) der Wert \(
-0 \cdot 4 + 1 \cdot 2 + 1 \cdot 1 = 3
-\). Jedem Tupel wird also eine Zahl, von 0 bis 7 zugewiesen.\\
+Machen wir ein genaueres Beispiel: \( k=2, l=3\)
 
-Die Bijektivität bedeutet also, dass eine Zahl zwischen 0 und $k^l-1$ dasselbe ist wie eine Folge von l Ziffern zur Basis k.\\
+Die möglichen Tupel sind:
 
-Dieses Lemma wollen wir nun beweisen.\\
+\( (0,0,0), (0,0,1), (0,1,0), (0,1,1), (1,0,0), (1,0,1), (1,1,0), (1,1,1) \). 
+
+Wendet man nun $f^3$ an, so ergibt sich zum Beispiel für das konkrete Tupel (0,1,1) der Wert \(
+0 \cdot 4 + 1 \cdot 2 + 1 \cdot 1 = 3 \). 
+Jedem Tupel wird also eine Zahl, von 0 bis 7 zugewiesen.
+\medskip
+
+Die Bijektivität bedeutet also, dass eine Zahl zwischen 0 und $k^l-1$ dasselbe ist wie eine Folge von l Ziffern zur Basis k.
+
+\medskip
+Dieses Lemma wollen wir nun beweisen.
 
 \begin{proof}
+    
+
 \textbf{1. Wohldefiniertheit:}
 
 Sei $(a_1,\dots,a_l) \in \{0,\dots,k-1\}^l$. Dann gilt für alle $i$:
@@ -321,7 +356,8 @@ Die rechte Summe ist eine geometrische Reihe:
 \[
 \sum_{i=1}^l (k-1)k^{l-i}
 = (k-1)\sum_{i=1}^l{k^{l-i}}
-= (k-1)\sum_{i=0}^{l-1}{k^{l-i-1}}
+= (k-1)\sum_{i=0}^{l-1}{k^{l-i-1}} \]
+\[
 = (k-1)\sum_{j=0}^{l-1} k^j
 = (k-1)\cdot \frac{k^l - 1}{k-1}
 = k^l - 1.
@@ -407,7 +443,7 @@ Da $f^l$ eine injektive Abbildung zwischen zwei endlichen Mengen gleicher Größ
 \vspace{0.5em}
 
 $f^l$ ist somit bijektiv.
-\end{proof}    
+\end{proof}
 
 %%Hier kommt nun schwieriger Beweis von Satz 1.20 (buch)
 
@@ -416,8 +452,7 @@ $f^l$ ist somit bijektiv.
 \end{thm}
 
 Der Beweis wird in Folge nur skizziert:
-
-\begin{proof}[Beweisskizze]
+\vspace{0.5em}
 Die Idee des Beweises besteht darin, die Wörter aus $A^*$ systematisch zu nummerieren.
 
 Zunächst werden alle Wörter nach ihrer Länge geordnet. Für jedes $l \in \N$ gibt es genau $|A|^l$ Wörter der Länge $l$. Da $A$ endlich ist, ist somit auch jede Menge $A^l$ endlich.
@@ -427,7 +462,7 @@ Anschließend werden die Wörter fester Länge $l$ eindeutig als Zahlen im $|A|$
 Durch diese Kodierung erhält man eine injektive Abbildung von $A^*$ nach $\N$, da Wörter unterschiedlicher Länge in verschiedene Bereiche fallen und die Darstellung innerhalb fester Länge eindeutig ist.
 
 Damit ist $A^*$ abzählbar.
-\end{proof}
+
 
 
 \begin{cor}
@@ -436,7 +471,9 @@ Damit ist $A^*$ abzählbar.
 \end{cor}
 
 \begin{proof}
+ 
     C++-Programme sind Wörter über einem endlichen Alphabet. Die zu zeigende Aussage folgt also aus Satz \ref{abzählbar}.
+   
 \end{proof}
 
 \begin{thm}
@@ -473,7 +510,7 @@ Genauso geht die Kodierung auch in die andere Richtung, jedes Programm kodiert e
 
 Wir definieren die Funktion wie folgt:
 \begin{align}
-    h: \N \times \N \to \{1,0\}\\
+    h: \N \times \N \to \{1,0\}
 \end{align}
 
 \begin{align}
@@ -483,7 +520,9 @@ Wir definieren die Funktion wie folgt:
     \end{cases}
 \end{align}
 
-x: Nummer eines Programms; y: Eingabe; h(x,y) sagt ob Programm stoppt oder nicht.\\
+x: Nummer eines Programms; y: Eingabe; h(x,y) sagt ob Programm stoppt oder nicht.
+
+\medskip
 
 Diese Funktion heißt \textbf{Haltefunktion} und ihr zugehöriges Entscheidungsproblem heißt \textbf{Halteproblem}.
 
@@ -494,11 +533,11 @@ Diese Funktion heißt \textbf{Haltefunktion} und ihr zugehöriges Entscheidungsp
 \begin{proof}
     Die Beweisidee ist ein Widerspruchsbeweis.
     
-    Angenommen, es existiert ein Programm P, das h(x,y) korrekt berechnet. Wir konstruieren ein neues Programm Q, das wie folgt funktioniert:
+    Angenommen, es existiert ein Programm P, das $h(x,y)$ korrekt berechnet. Wir konstruieren ein neues Programm Q, das wie folgt funktioniert:
 
     Bei Eingabe $x \in \N$:
     \begin{enumerate}
-        \item Berechne h(x,x)
+        \item Berechne $h(x,x)$
         \item Falls \(h(x,x) = 0 \rightarrow \) halte
         \item falls \(h(x,x) = 1\rightarrow \) laufe unendlich weiter 
     \end{enumerate}
@@ -506,14 +545,14 @@ Diese Funktion heißt \textbf{Haltefunktion} und ihr zugehöriges Entscheidungsp
    
     Es passiert also genau das Gegenteil von dem, was h voraussagt.
 
-    Da Q ein Programm ist und jedes Programm eine Nummer hat, gibt es ein q mit \( g(q) = Q\).
+    Da $Q$ ein Programm ist und jedes Programm eine Nummer hat, gibt es ein q mit \( g(q) = Q\).
 
     Nun betrachten wir h(q,q).
-    \paragraph{Fall 1:} Betrachte h(q,q) = 1. 
-    Q(q) hält aber nach Definition von Q läuft es unendlich weiter.
+    \paragraph{Fall 1:} Betrachte $h(q,q) = 1$. 
+    $Q(q)$ hält aber nach Definition von Q läuft es unendlich weiter.
 
-    \paragraph{Fall 2:} Betrachte h(q,q) = 0.
-    Q(q) läuft unendlich weiter aber nach Definition von Q müsste es halten.
+    \paragraph{Fall 2:} Betrachte $h(q,q) = 0$.
+    $Q(q)$ läuft unendlich weiter aber nach Definition von Q müsste es halten.
 \medskip
 
     In beiden Fällen entsteht also ein Widerspruch. Also war die Annahme falsch. Die Haltefunktion ist somit nicht berechenbar.
