@@ -369,13 +369,13 @@ Die rechte Summe ist eine geometrische Reihe:
 \end{frame}
 
 \begin{frame}{6 Halteproblem}
-Wir formen die rechte Summe um:
+Wir formen die rechte Summe um
 \[
 \sum_{i=1}^l (k-1)k^{l-i}
 = (k-1)\sum_{i=1}^l{k^{l-i}}
-= (k-1)\sum_{i=0}^{l-1}{k^{l-i-1}} \]
-\[
-= (k-1)\sum_{j=0}^{l-1} k^j
+\]
+Wir substituieren den Laufindex durch $j:=l-i$ und ersetzen die Indexgrenzen. Für $i=1$ erhalten wir die neue indexgrenze $j=l-1$ und für $i=l$ erhalten wir die neue Indexgrenze $j=0$.
+\[= (k-1)\sum_{j=0}^{l-1} k^j
 = (k-1)\cdot \frac{k^l - 1}{k-1}
 = k^l - 1.
 \]
@@ -483,7 +483,7 @@ $f^l$ ist somit bijektiv. %$\qed$
 \begin{frame}{6 Halteproblem}
 
     \begin{thm}
-    Sei A eine nichtleere Menge. Dann ist die Menge $A^*$ abzählbar.
+    Sei A eine endliche nichtleere Menge. Dann ist die Menge $A^*$ abzählbar.
 \end{thm}
 \vspace{0.5em}
 Der Beweis wird in Folge nur skizziert:
@@ -630,7 +630,7 @@ Nach Eingabe von \(n \in \N \) wird berechnet, ob die Collatz-Folge von n den We
 \textbf{Hauptquelle:}
 
 \begin{itemize}
-    \item B. H. Hougardy: \\
+    \item Stefan Hougardy und Jens Vygen: \\
     \textit{Algorithmische Mathematik} \\
     Springer, 2010
 \end{itemize}

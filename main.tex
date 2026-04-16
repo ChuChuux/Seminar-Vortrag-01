@@ -356,7 +356,8 @@ Die rechte Summe ist eine geometrische Reihe:
 \[
 \sum_{i=1}^l (k-1)k^{l-i}
 = (k-1)\sum_{i=1}^l{k^{l-i}}
-= (k-1)\sum_{i=0}^{l-1}{k^{l-i-1}} \]
+\]
+Wir substituieren den Laufindex durch $j:=l-i$ und ersetzen die Indexgrenzen. Für $i=1$ erhalten wir die neue indexgrenze $j=l-1$ und für $i=l$ erhalten wir die neue Indexgrenze $j=0$. Bei einer Summe macht es keinen Unterschied ob wir auf- oder abwärts summieren, daher beginnen wir nun bei $j=0$ bis $j=l-1$:
 \[
 = (k-1)\sum_{j=0}^{l-1} k^j
 = (k-1)\cdot \frac{k^l - 1}{k-1}
@@ -448,7 +449,7 @@ $f^l$ ist somit bijektiv.
 %%Hier kommt nun schwieriger Beweis von Satz 1.20 (buch)
 
 \begin{thm}
-    Sei A eine nichtleere Menge. Dann ist die Menge $A^*$ abzählbar.
+    Sei A eine endliche nichtleere Menge. Dann ist die Menge $A^*$ abzählbar.
 \end{thm}
 
 Der Beweis wird in Folge nur skizziert:
